@@ -1,0 +1,10 @@
+---
+key: "Iter_API-1.0.0"
+name : "Iter_API"
+displayName : "Iter_API"
+description: "Sample API"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/itr"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

@@ -1,0 +1,10 @@
+---
+key: "iterate_api-1.0.0"
+name : "iterate_api"
+displayName : "iterate_api"
+description: "Sample API"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/iterate"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

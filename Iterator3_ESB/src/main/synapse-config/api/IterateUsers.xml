@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/users" name="IterateUsers" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST">
+        <inSequence>
+            <iterate attachPath="json-eval($.Students)" expression="json-eval($.Students)" id="iterate-over-users" preservePayload="true">
+                <target>
+                    <sequence>
+                        <send>
+                            <endpoint>
+                                <http method="post" uri-template="http://localhost:8290/fake">
+                                    <suspendOnFailure>
+                                        <initialDuration>-1</initialDuration>
+                                        <progressionFactor>1</progressionFactor>
+                                    </suspendOnFailure>
+                                    <markForSuspension>
+                                        <retriesBeforeSuspension>0</retriesBeforeSuspension>
+                                    </markForSuspension>
+                                </http>
+                            </endpoint>
+                        </send>
+                    </sequence>
+                </target>
+            </iterate>
+        </inSequence>
+        <outSequence>
+            <aggregate id="iterate-over-users">
+                <completeCondition>
+                    <messageCount max="-1" min="-1"/>
+                </completeCondition>
+                <onComplete aggregateElementType="root" expression="json-eval($)">
+                    <log level="full">
+                        <property expression="json-eval($)" name="After-Iteration"/>
+                    </log>
+                    <respond/>
+                </onComplete>
+            </aggregate>
+        </outSequence>
+        <faultSequence/>
+    </resource>
+</api>

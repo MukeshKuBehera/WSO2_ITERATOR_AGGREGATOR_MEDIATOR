@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/iterate" name="iterate_api" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST">
+        <inSequence>
+            <log level="full" separator="----input-----"/>
+            <property expression="count(//Account)" name="countRequest" scope="default" type="STRING"/>
+            <iterate attachPath="." expression="//Account" id="Iterate" preservePayload="true" sequential="true">
+                <target>
+                    <sequence>
+                        <payloadFactory media-type="xml">
+                            <format>
+                                <echo:echoString xmlns:echo="http://echo.services.core.carbon.wso2.org">
+                                    <in xmlns="">$1</in>
+                                </echo:echoString>
+                            </format>
+                            <args>
+                                <arg evaluator="xml" expression="//Account/text()"/>
+                            </args>
+                        </payloadFactory>
+                        <log category="DEBUG" separator="----REQUEST---">
+                            <property expression="$body" name="request"/>
+                        </log>
+                        <call>
+                            <endpoint>
+                                <http method="post" uri-template="http://localhost:8290/echo">
+                                    <suspendOnFailure>
+                                        <initialDuration>-1</initialDuration>
+                                        <progressionFactor>-1</progressionFactor>
+                                        <maximumDuration>0</maximumDuration>
+                                    </suspendOnFailure>
+                                    <markForSuspension>
+                                        <retriesBeforeSuspension>0</retriesBeforeSuspension>
+                                    </markForSuspension>
+                                </http>
+                            </endpoint>
+                        </call>
+                    </sequence>
+                </target>
+            </iterate>
+            <aggregate id="Iterate">
+                <completeCondition timeout="10">
+                    <messageCount max="{get-property('countRequest')}" min="{get-property('countRequest')}"/>
+                </completeCondition>
+                <onComplete aggregateElementType="root" expression="//ns:echoStringResponse" xmlns:ns="http://echo.services.core.carbon.wso2.org">
+                    <log level="full" separator="----Aggregated-----">
+                        <property expression="$body" name="aggregated_body"/>
+                    </log>
+                </onComplete>
+            </aggregate>
+            <payloadFactory media-type="xml">
+                <format>
+                    <response xmlns="">$1</response>
+                </format>
+                <args>
+                    <arg evaluator="xml" expression="//ns:echoStringResponse" xmlns:ns="http://echo.services.core.carbon.wso2.org"/>
+                </args>
+            </payloadFactory>
+            <respond/>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+</api>

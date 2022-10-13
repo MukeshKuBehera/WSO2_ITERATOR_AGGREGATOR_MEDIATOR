@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/test" name="dummy_api" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST">
+        <inSequence>
+            <log level="full">
+                <property expression="json-eval($)" name="InputObjects"/>
+            </log>
+            <propertyGroup>
+                <property expression="json-eval($.Students)" name="ORIGINAL_PAYLOAD" scope="default" type="STRING"/>
+            </propertyGroup>
+            <log level="full">
+                <property expression="$ctx:ORIGINAL_PAYLOAD" name="!!!! ORIGINAL_PAYLOAD !!!!!"/>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"Users":$1}</format>
+                <args>
+                    <arg evaluator="xml" expression="$ctx:ORIGINAL_PAYLOAD"/>
+                </args>
+            </payloadFactory>
+            <foreach expression="json-eval($.Users)" id="onebyone">
+                <sequence>
+                    <log level="custom">
+                        <property expression="json-eval($)" name="!!!! Itterating !!!!!"/>
+                    </log>
+                </sequence>
+            </foreach>
+            <aggregate id="onebyone">
+                <completeCondition>
+                    <messageCount max="-1" min="-1"/>
+                </completeCondition>
+                <onComplete aggregateElementType="root" expression="json-eval($)">
+                    <log level="full"/>
+                </onComplete>
+            </aggregate>
+            <log level="full">
+                <property expression="json-eval($)" name="Response_Payload"/>
+            </log>
+            <respond/>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+</api>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/fake" name="Fake_API" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST">
+        <inSequence>
+            <log level="full">
+                <property expression="json-eval($)" name="---BEFORE PAYLOAD-------"/>
+            </log>
+            <propertyGroup>
+                <property expression="json-eval($.Students)" name="BEFORE-PAYLOAD" scope="default" type="STRING"/>
+            </propertyGroup>
+            <payloadFactory media-type="json">
+                <format>{"Students":$1}</format>
+                <args>
+                    <arg evaluator="xml" expression="$ctx:BEFORE-PAYLOAD"/>
+                </args>
+            </payloadFactory>
+            <log>
+                <property expression="$ctx:BEFORE-PAYLOAD" name="AFTER-PAYLOAD"/>
+            </log>
+            <respond/>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+</api>

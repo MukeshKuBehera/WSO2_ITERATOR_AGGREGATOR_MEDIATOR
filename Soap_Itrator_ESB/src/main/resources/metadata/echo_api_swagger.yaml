@@ -1,0 +1,13 @@
+openapi: 3.0.1
+info:
+  title: echo_api
+  description: API Definition of echo_api
+  version: 1.0.0
+servers:
+- url: http://localhost:8290/echo
+paths:
+  /:
+    post:
+      responses:
+        default:
+          description: Default response
